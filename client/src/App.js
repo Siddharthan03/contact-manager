@@ -1,28 +1,13 @@
-import { useEffect, useState } from "react";
-import api from "./services/api";
+import { useState } from "react";
 import ContactForm from "./components/ContactForm";
 import ContactList from "./components/ContactList";
 
 function App() {
   const [contacts, setContacts] = useState([]);
 
-  // 🔹 Load session-only contacts on first render
-  useEffect(() => {
-    const sessionContacts =
-      JSON.parse(sessionStorage.getItem("sessionContacts")) || [];
-    setContacts(sessionContacts);
-  }, []);
-
-  // 🔹 Add contact only for this tab session
+  // 🔥 Add contact ONLY to memory (page lifetime)
   const addContactToUI = (newContact) => {
-    setContacts((prev) => {
-      const updated = [newContact, ...prev];
-      sessionStorage.setItem(
-        "sessionContacts",
-        JSON.stringify(updated)
-      );
-      return updated;
-    });
+    setContacts((prev) => [newContact, ...prev]);
   };
 
   return (
