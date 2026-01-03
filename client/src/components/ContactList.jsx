@@ -1,10 +1,13 @@
 import api from "../services/api";
 
-export default function ContactList({ contacts, fetchContacts }) {
+export default function ContactList({ contacts, setContacts }) {
   const deleteContact = async (id) => {
     try {
+      // Delete from backend
       await api.delete(`/api/contacts/${id}`);
-      fetchContacts();
+
+      // 🔥 Remove from UI (memory only)
+      setContacts((prev) => prev.filter((c) => c._id !== id));
     } catch (error) {
       console.error("Error deleting contact:", error);
     }
