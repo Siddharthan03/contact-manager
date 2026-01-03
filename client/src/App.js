@@ -6,20 +6,21 @@ import ContactList from "./components/ContactList";
 function App() {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   const fetchContacts = async () => {
     try {
-      setLoading(true);
-      setError("");
       const res = await api.get("/api/contacts");
       setContacts(res.data);
     } catch (err) {
       console.error("Failed to fetch contacts", err);
-      setError("Failed to load contacts. Please refresh.");
     } finally {
       setLoading(false);
     }
+  };
+
+  // 🔥 THIS IS THE KEY
+  const addContactToUI = (newContact) => {
+    setContacts((prev) => [newContact, ...prev]);
   };
 
   useEffect(() => {
@@ -35,25 +36,20 @@ function App() {
       </div>
 
       {/* Contact Form */}
-      <ContactForm fetchContacts={fetchContacts} />
+      <ContactForm
+        fetchContacts={fetchContacts}
+        addContactToUI={addContactToUI}
+      />
 
       {/* Contact List */}
       <div className="mt-4">
-        {loading && (
+        {loading ? (
           <p className="text-center text-muted">Loading contacts...</p>
-        )}
-
-        {error && (
-          <p className="text-center text-danger">{error}</p>
-        )}
-
-        {!loading && !error && contacts.length === 0 && (
+        ) : contacts.length === 0 ? (
           <p className="text-center text-muted">
             No contacts found. Add your first contact above.
           </p>
-        )}
-
-        {!loading && !error && contacts.length > 0 && (
+        ) : (
           <ContactList
             contacts={contacts}
             fetchContacts={fetchContacts}
