@@ -20,9 +20,10 @@ export default function ContactForm({ addContactToUI }) {
     e.preventDefault();
 
     try {
+      // Save to backend
       const res = await api.post("/api/contacts", form);
 
-      // ✅ Display only for this tab session
+      // 🔥 Show immediately in UI (memory only)
       addContactToUI(res.data);
 
       setForm({ name: "", email: "", phone: "", message: "" });
