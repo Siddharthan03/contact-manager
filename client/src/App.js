@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "./services/api";
 import ContactForm from "./components/ContactForm";
 import ContactList from "./components/ContactList";
 
-const API_URL = "http://localhost:5000/api/contacts";
-
-function App() {
+export default function App() {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   const fetchContacts = async () => {
     try {
-      setLoading(true);
-      const res = await axios.get(API_URL);
+      setError("");
+      const res = await api.get("/api/contacts");
       setContacts(res.data);
-    } catch (error) {
-      console.error("Failed to fetch contacts", error);
+    } catch (err) {
+      console.error("Failed to fetch contacts", err);
+      setError("Unable to load contacts. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -27,34 +27,17 @@ function App() {
 
   return (
     <div className="container mt-5">
-      {/* Header */}
-      <div className="text-center mb-4">
-        <h2>Contact Management System</h2>
-        <p className="text-muted">
-          Built using MERN Stack
-        </p>
-      </div>
+      <h2 className="mb-4">📇 Contact Manager</h2>
 
-      {/* Contact Form */}
       <ContactForm fetchContacts={fetchContacts} />
 
-      {/* Contact List */}
-      <div className="mt-4">
-        {loading ? (
-          <p className="text-center text-muted">Loading contacts...</p>
-        ) : contacts.length === 0 ? (
-          <p className="text-center text-muted">
-            No contacts found. Add your first contact above.
-          </p>
-        ) : (
-          <ContactList
-            contacts={contacts}
-            fetchContacts={fetchContacts}
-          />
-        )}
-      </div>
+      {loading && <p>Loading contacts...</p>}
+
+      {error && <p className="text-danger">{error}</p>}
+
+      {!loading && !error && (
+        <ContactList contacts={contacts} fetchContacts={fetchContacts} />
+      )}
     </div>
   );
 }
-
-export default App;
