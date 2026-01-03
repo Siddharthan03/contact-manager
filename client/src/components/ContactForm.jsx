@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../services/api";
 
-export default function ContactForm({ fetchContacts, addContactToUI }) {
+export default function ContactForm({ addContactToUI }) {
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -22,7 +22,7 @@ export default function ContactForm({ fetchContacts, addContactToUI }) {
     try {
       const res = await api.post("/api/contacts", form);
 
-      // 🔥 IMMEDIATE UI UPDATE
+      // ✅ Display only for this tab session
       addContactToUI(res.data);
 
       setForm({ name: "", email: "", phone: "", message: "" });
