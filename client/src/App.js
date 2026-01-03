@@ -5,27 +5,25 @@ import ContactList from "./components/ContactList";
 
 function App() {
   const [contacts, setContacts] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  const fetchContacts = async () => {
-    try {
-      const res = await api.get("/api/contacts");
-      setContacts(res.data);
-    } catch (err) {
-      console.error("Failed to fetch contacts", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // 🔥 THIS IS THE KEY
-  const addContactToUI = (newContact) => {
-    setContacts((prev) => [newContact, ...prev]);
-  };
-
+  // 🔹 Load session-only contacts on first render
   useEffect(() => {
-    fetchContacts();
+    const sessionContacts =
+      JSON.parse(sessionStorage.getItem("sessionContacts")) || [];
+    setContacts(sessionContacts);
   }, []);
+
+  // 🔹 Add contact only for this tab session
+  const addContactToUI = (newContact) => {
+    setContacts((prev) => {
+      const updated = [newContact, ...prev];
+      sessionStorage.setItem(
+        "sessionContacts",
+        JSON.stringify(updated)
+      );
+      return updated;
+    });
+  };
 
   return (
     <div className="container mt-5">
@@ -36,24 +34,16 @@ function App() {
       </div>
 
       {/* Contact Form */}
-      <ContactForm
-        fetchContacts={fetchContacts}
-        addContactToUI={addContactToUI}
-      />
+      <ContactForm addContactToUI={addContactToUI} />
 
       {/* Contact List */}
       <div className="mt-4">
-        {loading ? (
-          <p className="text-center text-muted">Loading contacts...</p>
-        ) : contacts.length === 0 ? (
+        {contacts.length === 0 ? (
           <p className="text-center text-muted">
             No contacts found. Add your first contact above.
           </p>
         ) : (
-          <ContactList
-            contacts={contacts}
-            fetchContacts={fetchContacts}
-          />
+          <ContactList contacts={contacts} />
         )}
       </div>
     </div>
