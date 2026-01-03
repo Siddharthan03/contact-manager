@@ -1,7 +1,7 @@
 import { useState } from "react";
 import api from "../services/api";
 
-export default function ContactForm({ fetchContacts }) {
+export default function ContactForm({ fetchContacts, addContactToUI }) {
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -20,17 +20,17 @@ export default function ContactForm({ fetchContacts }) {
     e.preventDefault();
 
     try {
-      console.log("Submitting form data:", form);
+      const res = await api.post("/api/contacts", form);
 
-      await api.post("/api/contacts", form);
+      // 🔥 IMMEDIATE UI UPDATE
+      addContactToUI(res.data);
 
       setForm({ name: "", email: "", phone: "", message: "" });
       setSuccess("Contact submitted successfully!");
-      fetchContacts();
 
       setTimeout(() => setSuccess(""), 2000);
-    } catch (error) {
-      console.error("Error submitting contact:", error);
+    } catch (err) {
+      console.error("Error submitting contact", err);
     }
   };
 
